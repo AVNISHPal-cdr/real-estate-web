@@ -1,0 +1,307 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Real Estate — Demo</title>
+  <style>
+    :root{--bg:rgba(247,250,252,0.6);--card:rgba(255,255,255,0.8);--muted:#6b7280;--accent:#4f46e5}
+    *{box-sizing:border-box}
+    body{font-family:Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; margin:0; background:url('https://images.unsplash.com/photo-1501183638710-841dd1904471?auto=format&fit=crop&w=1950&q=80') center/cover no-repeat fixed; color:#0f172a; backdrop-filter:blur(2px)}
+    .container{max-width:1200px;margin:28px auto;padding:0 20px}
+    header{display:flex;align-items:center;justify-content:space-between;gap:16px}
+    .brand{display:flex;align-items:center;gap:12px}
+    .logo{width:44px;height:44px;border-radius:10px;background:linear-gradient(135deg,var(--accent),#06b6d4);display:flex;align-items:center;justify-content:center;color:white;font-weight:700}
+    h1{font-size:20px;margin:0}
+    p.lead{margin:0;color:var(--muted);font-size:14px}
+
+    /* search panel */
+    .panel{background:var(--card);padding:18px;border-radius:14px;box-shadow:0 6px 18px rgba(15,23,42,0.06);margin-top:18px}
+    .controls{display:flex;flex-wrap:wrap;gap:12px;align-items:end}
+    label{font-size:12px;color:var(--muted);display:block;margin-bottom:6px}
+    input[type=text], input[type=number], select{padding:10px 12px;border-radius:8px;border:1px solid #e6e9ef;background:white;font-size:14px}
+    .grow{flex:1;min-width:180px}
+    .btn{padding:10px 14px;border-radius:10px;border:0;background:var(--accent);color:white;cursor:pointer}
+    .btn.ghost{background:transparent;color:var(--muted);border:1px solid #e6e9ef}
+
+    /* results header */
+    .results-head{display:flex;align-items:center;justify-content:space-between;margin-top:14px}
+    .view-toggle button{padding:8px 10px;border-radius:8px;border:1px solid #e6e9ef;background:white;cursor:pointer;margin-left:8px}
+    .view-toggle button.active{background:var(--accent);color:white;border-color:var(--accent)}
+
+    /* grid/list */
+    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px;margin-top:16px}
+    .card{background:var(--card);border-radius:12px;overflow:hidden;box-shadow:0 6px 18px rgba(15,23,42,0.04);display:flex;flex-direction:column}
+    .thumb{height:160px;background-size:cover;background-position:center}
+    .card-body{padding:12px;display:flex;flex-direction:column;gap:8px}
+    .meta{font-size:13px;color:var(--muted)}
+    .price{font-weight:700}
+    .actions{margin-top:auto;display:flex;gap:8px}
+    .link{background:#eef2ff;color:var(--accent);padding:8px 10px;border-radius:8px;border:0;cursor:pointer}
+
+    /* list view styles */
+    .list{display:flex;flex-direction:column;gap:12px}
+    .list .card{flex-direction:row;height:140px}
+    .list .thumb{width:260px;height:100%;flex-shrink:0}
+
+    /* modal */
+    .modal-backdrop{position:fixed;inset:0;background:rgba(2,6,23,0.5);display:flex;align-items:center;justify-content:center;padding:20px}
+    .modal{background:white;border-radius:12px;width:900px;max-width:100%;max-height:90vh;overflow:auto}
+    .modal .modal-body{display:flex;gap:16px;padding:18px}
+    .gallery{flex:1}
+    .details{width:320px;padding:6px}
+    .close{position:absolute;right:14px;top:10px;background:#fff;border-radius:8px;padding:6px;border:1px solid #e6e9ef;cursor:pointer}
+
+    /* contact form */
+    form{display:flex;flex-direction:column;gap:8px}
+    textarea{min-height:100px;padding:10px;border-radius:8px;border:1px solid #e6e9ef}
+
+    footer{margin:32px 0;color:var(--muted);font-size:13px;text-align:center}
+
+    /* responsive tweaks */
+    @media (max-width:720px){.controls{flex-direction:column;align-items:stretch}.list .card{flex-direction:column;height:auto}.list .thumb{width:100%;height:160px}} 
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="brand">
+        <div class="logo">RE</div>
+        <div>
+          <h1>Real Estate — Demo</h1>
+          <p class="lead">Find homes, apartments and places you'll love.</p>
+        </div>
+      </div>
+      <div>
+        <button class="btn" id="contactTop">Contact Agent</button>
+      </div>
+    </header>
+
+    <section class="panel" aria-labelledby="search-heading">
+      <h2 id="search-heading" style="margin:0 0 10px 0">Search properties</h2>
+      <div class="controls">
+        <div class="grow">
+          <label for="q">City, neighbourhood or title</label>
+          <input id="q" type="text" placeholder="e.g. Mumbai, Bandra, 3 BHK" />
+        </div>
+        <div>
+          <label for="min">Min price</label>
+          <input id="min" type="number" value="0" />
+        </div>
+        <div>
+          <label for="max">Max price</label>
+          <input id="max" type="number" value="2000000" />
+        </div>
+        <div>
+          <label for="beds">Beds</label>
+          <select id="beds">
+            <option value="">Any</option>
+            <option>1</option>
+            <option>2</option>
+            <option>3</option>
+            <option>4</option>
+          </select>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <button class="btn" id="apply">Apply</button>
+          <button class="btn ghost" id="reset">Reset</button>
+        </div>
+      </div>
+
+      <div class="results-head">
+        <div id="count">0 properties found</div>
+        <div style="display:flex;align-items:center">
+          <div class="view-toggle" role="tablist" aria-label="View">
+            <button id="gridBtn" class="active" aria-pressed="true">Grid</button>
+            <button id="listBtn">List</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="results" class="grid" aria-live="polite"></section>
+
+    <footer>Built with plain HTML, CSS & JavaScript • Demo data only</footer>
+  </div>
+
+  <!-- modal container -->
+  <div id="modalRoot" style="display:none"></div>
+
+  <script>
+    // MOCKED DATA: Replace or plug an API to fetch real properties.
+    const PROPERTIES = [
+      {id:1,title:'Modern 3 BHK Apartment',address:'Bandra West',city:'Mumbai',price:18000000,bedrooms:3,img:'https://via.placeholder.com/800x600?text=House+1',area:'1500 sqft',desc:'Bright 3 BHK with balcony, modern kitchen and parking.'},
+      {id:2,title:'Cozy 2 BHK',address:'Powai',city:'Mumbai',price:9500000,bedrooms:2,img:'https://via.placeholder.com/800x600?text=House+2',area:'950 sqft',desc:'Well-located 2 BHK near lake and metro.'},
+      {id:3,title:'Luxury Villa',address:'Lonavala',city:'Pune',price:35000000,bedrooms:4,img:'https://via.placeholder.com/800x600?text=House+3',area:'4200 sqft',desc:'Private villa with garden and pool.'},
+      {id:4,title:'Studio Apartment',address:'Andheri',city:'Mumbai',price:4500000,bedrooms:1,img:'https://via.placeholder.com/800x600?text=House+4',area:'420 sqft',desc:'Compact studio, ideal for single professionals.'},
+      {id:5,title:'Family Home - 3 BHK',address:'Khar',city:'Mumbai',price:22000000,bedrooms:3,img:'https://via.placeholder.com/800x600?text=House+5',area:'1800 sqft',desc:'Quiet street, great schools nearby.'}
+    ];
+
+    // State
+    let state = {view:'grid',query:'',min:0,max:20000000,beds:''};
+
+    // Elements
+    const qEl = document.getElementById('q');
+    const minEl = document.getElementById('min');
+    const maxEl = document.getElementById('max');
+    const bedsEl = document.getElementById('beds');
+    const applyBtn = document.getElementById('apply');
+    const resetBtn = document.getElementById('reset');
+    const resultsEl = document.getElementById('results');
+    const countEl = document.getElementById('count');
+    const gridBtn = document.getElementById('gridBtn');
+    const listBtn = document.getElementById('listBtn');
+    const modalRoot = document.getElementById('modalRoot');
+    const contactTop = document.getElementById('contactTop');
+
+    function formatPrice(n){ return '₹' + n.toString().replace(/\B(?=(\d{3})+(?!\d))/g,','); }
+
+    function renderList(){
+      const filtered = PROPERTIES.filter(p => {
+        if (p.price < Number(state.min) || p.price > Number(state.max)) return false;
+        if (state.beds && String(p.bedrooms) !== String(state.beds)) return false;
+        const q = state.query.trim().toLowerCase();
+        if (!q) return true;
+        return p.title.toLowerCase().includes(q) || p.address.toLowerCase().includes(q) || p.city.toLowerCase().includes(q);
+      });
+
+      countEl.textContent = `${filtered.length} properties found`;
+
+      // set view class
+      if(state.view === 'list'){
+        resultsEl.className = 'list';
+      }else{
+        resultsEl.className = 'grid';
+      }
+
+      resultsEl.innerHTML = '';
+      filtered.forEach(p => {
+        const card = document.createElement('article');
+        card.className = 'card';
+        card.setAttribute('tabindex','0');
+
+        const thumb = document.createElement('div');
+        thumb.className = 'thumb';
+        thumb.style.backgroundImage = `url(${p.img})`;
+
+        const body = document.createElement('div');
+        body.className = 'card-body';
+
+        const title = document.createElement('div');
+        title.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center"><div><strong>${p.title}</strong><div class="meta">${p.address}, ${p.city}</div></div><div class="price">${formatPrice(p.price)}</div></div>`;
+
+        const info = document.createElement('div');
+        info.className = 'meta';
+        info.textContent = `${p.bedrooms} beds • ${p.area}`;
+
+        const actions = document.createElement('div');
+        actions.className = 'actions';
+        const viewBtn = document.createElement('button');
+        viewBtn.className = 'link';
+        viewBtn.textContent = 'View';
+        viewBtn.onclick = () => openModal(p);
+
+        const contactBtn = document.createElement('button');
+        contactBtn.className = 'link';
+        contactBtn.textContent = 'Contact';
+        contactBtn.onclick = () => openContact(p);
+
+        actions.appendChild(viewBtn);
+        actions.appendChild(contactBtn);
+
+        body.appendChild(title);
+        body.appendChild(info);
+        body.appendChild(actions);
+
+        if(state.view === 'list'){
+          card.appendChild(thumb);
+          card.appendChild(body);
+        }else{
+          card.appendChild(thumb);
+          card.appendChild(body);
+        }
+
+        resultsEl.appendChild(card);
+      });
+    }
+
+    function openModal(p){
+      modalRoot.innerHTML = '';
+      modalRoot.style.display = 'block';
+
+      const backdrop = document.createElement('div');
+      backdrop.className = 'modal-backdrop';
+      backdrop.onclick = (e) => { if(e.target === backdrop) closeModal(); };
+
+      const modal = document.createElement('div');
+      modal.className = 'modal';
+
+      const closeBtn = document.createElement('button');
+      closeBtn.className = 'close';
+      closeBtn.textContent = '✕';
+      closeBtn.onclick = closeModal;
+
+      const body = document.createElement('div');
+      body.className = 'modal-body';
+
+      const gallery = document.createElement('div');
+      gallery.className = 'gallery';
+      const big = document.createElement('div');
+      big.style.height = '360px';
+      big.style.backgroundImage = `url(${p.img})`;
+      big.style.backgroundSize = 'cover';
+      big.style.backgroundPosition = 'center';
+      big.style.borderRadius = '10px';
+      gallery.appendChild(big);
+
+      const details = document.createElement('div');
+      details.className = 'details';
+      details.innerHTML = `<h3 style="margin-top:0">${p.title}</h3><div class="meta">${p.address}, ${p.city}</div><p style="margin:8px 0">${p.desc}</p><div style="font-weight:700;margin:8px 0">${formatPrice(p.price)}</div>`;
+
+      const contactForm = document.createElement('form');
+      contactForm.innerHTML = `<label>Name</label><input name="name" required /><label>Email</label><input name="email" type="email" required /><label>Message</label><textarea name="message">I'm interested in ${p.title} (${p.address})</textarea><button class="btn" type="submit">Send inquiry</button>`;
+      contactForm.onsubmit = (e) => { e.preventDefault(); alert('Inquiry sent — demo only.\n' + JSON.stringify({property:p.title, name:e.target.name.value, email:e.target.email.value, message:e.target.message.value},null,2)) };
+
+      details.appendChild(contactForm);
+      body.appendChild(gallery);
+      body.appendChild(details);
+
+      modal.appendChild(closeBtn);
+      modal.appendChild(body);
+      backdrop.appendChild(modal);
+      modalRoot.appendChild(backdrop);
+    }
+    function closeModal(){ modalRoot.innerHTML=''; modalRoot.style.display='none'; }
+
+    function openContact(p){
+      const name = prompt('Your name');
+      if(!name) return;
+      const email = prompt('Your email');
+      if(!email) return;
+      alert('Contact request submitted (demo).\n' + JSON.stringify({property:p.title, name, email}));
+    }
+
+    // wire buttons
+    applyBtn.onclick = () => {
+      state.query = qEl.value;
+      state.min = Number(minEl.value || 0);
+      state.max = Number(maxEl.value || 999999999);
+      state.beds = bedsEl.value;
+      renderList();
+    };
+    resetBtn.onclick = () => { qEl.value=''; minEl.value=0; maxEl.value=2000000; bedsEl.value=''; state={...state, query:'',min:0,max:2000000,beds:''}; renderList(); };
+
+    gridBtn.onclick = () => { state.view='grid'; gridBtn.classList.add('active'); listBtn.classList.remove('active'); renderList(); };
+    listBtn.onclick = () => { state.view='list'; listBtn.classList.add('active'); gridBtn.classList.remove('active'); renderList(); };
+
+    contactTop.onclick = () => {
+      const name = prompt('Your name for contact');
+      const email = prompt('Your email');
+      if(name && email) alert('Thanks — we will reach out (demo only)');
+    }
+
+    // initial render
+    renderList();
+  </script>
+</body>
+</html>
